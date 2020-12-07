@@ -6,6 +6,11 @@
 import scrapy
 
 
+class ScrapyEventItem(scrapy.Item):
+    event_url = scrapy.Field()
+    date_scraped = scrapy.Field()
+
+
 class ScrapyUfcstatsItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
