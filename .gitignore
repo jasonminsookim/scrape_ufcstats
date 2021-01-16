@@ -2,7 +2,9 @@
 
 .ipynb_checkpoints
 
-data/
+/data
 
 dask-worker-space/
 
+
+config.yml
