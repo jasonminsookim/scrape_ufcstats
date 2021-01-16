@@ -163,6 +163,7 @@ dependencies:
   - sip=4.19.8=py38h0a44026_0
   - six=1.15.0=py38hecd8cb5_0
   - sortedcontainers=2.3.0=pyhd3eb1b0_0
+  - sqlalchemy=1.3.19=py38haf1e3a3_0
   - sqlite=3.33.0=hffcf06c_0
   - tabulate=0.8.7=py38_0
   - tblib=1.7.0=py_0
