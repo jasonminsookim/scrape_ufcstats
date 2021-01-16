@@ -17,6 +17,7 @@ class EventsSpider(Spider):
             yield Request(event_url, callback=self.parse_event)
 
     def parse_event(self, response):
+
         items = ScrapyEventItem()
 
         items["event_url"] = response.url

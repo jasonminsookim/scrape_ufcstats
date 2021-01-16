@@ -8,7 +8,7 @@ from sqlalchemy import exc
 
 
 # Loads the config file.
-with open("config.yml") as f:
+with open("/Users/jasonkim/Desktop/1_python_projects/scrape_ufcstats/config.yml") as f:
     yaml_config = yaml.load(f, Loader=yaml.FullLoader)
 
 DATABASE = {
@@ -21,9 +21,12 @@ DATABASE = {
 
 
 @task
-def connect_postgres():
-    """ Connect to the PostgreSQL database server """
+def read_csv(path):
+    return pd.read_csv(path)
 
+
+@task
+def df_to_table(df, table_name):
     # Gets the logger for prefect.
     logger = prefect.context.get("logger")
 
@@ -34,24 +37,11 @@ def connect_postgres():
         logger.info(f'Connecting to the PostgreSQL database {DATABASE["database"]} ...')
         engine = create_engine(url.URL(**DATABASE))
     except (Exception, exc.SQLAlchemyError) as error:
-        logger.warning(error)
-
+        logger.warning(f"{error}")
     logger.info("Connection to db successful.")
-    return engine
-
-
-@task
-def read_csv(path):
-    return pd.read_csv(path)
-
-
-@task
-def df_to_table(df, engine, table_name):
-    # Gets the logger for prefect.
-    logger = prefect.context.get("logger")
 
     try:
         logger.info(f"Moving df to postgres {table_name} table ...")
-        df.to_sql(table_name, con=engine)
+        df.to_sql(table_name, con=engine, if_exists="replace", index=False)
     except (Exception, exc.SQLAlchemyError) as error:
-        logger.warning(error)
+        logger.warning(f"{error}")
