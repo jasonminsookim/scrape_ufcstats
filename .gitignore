@@ -6,5 +6,6 @@
 
 dask-worker-space/
 
-
 config.yml
+
+*.pyc
