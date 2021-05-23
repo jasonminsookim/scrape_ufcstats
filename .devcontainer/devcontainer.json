@@ -35,7 +35,17 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"ms-python.python",
-		"ms-python.vscode-pylance"
+		"ms-python.vscode-pylance",
+		"alefragnani.bookmarks",
+		"coenraads.bracket-pair-colorizer",
+		"pkief.material-icon-theme",
+		"jojoee.conda-cheatsheet",
+		"dzhavat.git-cheatsheet",
+		"mhutchie.git-graph",
+		"donjayamanne.githistory",
+		"ms-toolsai.jupyter",
+		"mechatroner.rainbow-csv",
+		"tabnine.tabnine-vscode"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
