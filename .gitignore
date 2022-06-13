@@ -1,0 +1,13 @@
+.idea/
+
+.ipynb_checkpoints
+
+/data
+
+dask-worker-space/
+
+config.yml
+
+*.pyc
+
+.DS_Store

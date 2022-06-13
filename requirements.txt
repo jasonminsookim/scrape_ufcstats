@@ -1,0 +1,5 @@
+Scrapy == 2.6.1
+jupyterlab ==  3.4.3
+psycopg2 == 2.9.3
+SQLAlchemy == 1.4.37
+pandas == 1.4.2
