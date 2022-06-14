@@ -10,6 +10,5 @@ RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requ
     && rm -rf /tmp/pip-tmp
 
 COPY ./ ./
-WORKDIR "/scrapy_ufcstats"
 
-CMD scrapy crawl events -t csv -o ../data/events.csv
+ENTRYPOINT /bin/bash ./scrape.sh
