@@ -39,16 +39,14 @@ class EventsSpider(Spider):
 
         rx = re.compile( fr"\s+(?=(?:{'|'.join(MONTHS_ARR)})\b)", re.I )
         for i in range(len(event_urls)):
-            event_item = ScrapyEventItem()
-
             event_url = event_urls[i]
             event_location = events_df.iloc[i, 1]
             event_name_date = events_df.iloc[i, 0]
             event_name = rx.split(event_name_date)[0]
             event_date_str = rx.split(event_name_date)[-1].strip()
             event_date = datetime.strptime(event_date_str, "%B %d, %Y")
-            print(event_date)
 
+            event_item = ScrapyEventItem()
             event_item["event_name"] = event_name
             event_item["event_date"]  = event_date
             event_item["event_url"] = event_url
