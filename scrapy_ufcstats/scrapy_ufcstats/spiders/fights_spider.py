@@ -14,7 +14,7 @@ class FightsSpider(Spider):
         return(pre_of, post_of)
 
     def start_requests(self):
-        event_urls = pd.read_csv("../data/events.csv")["event_url"]
+        event_urls = pd.read_csv("../data/events.csv")["event_url"][:10]
 
         for event_url in event_urls:
             yield Request(
@@ -70,10 +70,10 @@ class FightsSpider(Spider):
         ).extract()
 
         # Data wrangles names.
-        fight_item["fighter_1"] = fighters[0].strip()
-        fight_item["fighter_1_nn"] = nicknames[0].strip()
-        fight_item["fighter_2"] = fighters[1].strip()
-        fight_item["fighter_2_nn"] = nicknames[1].strip()
+        fight_item["fighter1_name"] = fighters[0].strip()
+        fight_item["fighter1_nickname"] = nicknames[0].strip()
+        fight_item["fighter2_name"] = fighters[1].strip()
+        fight_item["fighter2_nickname"] = nicknames[1].strip()
 
         # Extracts who won the fight.
         fighter_1_outcome = response.xpath(
@@ -84,9 +84,9 @@ class FightsSpider(Spider):
         ).extract()
         fighter_1_outcome = fighter_1_outcome[0].strip()
         if fighter_1_outcome == "W":
-            fight_item["winner"] = fight_item["fighter_1"]
+            fight_item["winner"] = fight_item["fighter1_name"]
         elif fighter_1_outcome == "L":
-            fight_item["winner"] = fight_item["fighter_2"]
+            fight_item["winner"] = fight_item["fighter2_name"]
         else:
             fight_item["winner"] = "Draw"
 
@@ -123,19 +123,19 @@ class FightsSpider(Spider):
             .strip()
         )
 
-        # Extracts number of rounds fought.
-        rounds = response.xpath(
+        # Extracts number of end_round fought.
+        end_round = response.xpath(
             "/html[1]/body[1]/section[1]/div[1]/div[1]/div[2]/div[2]/p[1]/i[2]"
         ).get()
         # Data wrangles rounds by getting rid of all non numeric values and type converting string to int
-        fight_item["rounds"] = int(
-            re.sub("[^0-9]", "", rounds.split(" Round:\n        </i>\n ")[-1])
+        fight_item["end_round"] = int(
+            re.sub("[^0-9]", "", end_round.split(" Round:\n        </i>\n ")[-1])
         )
 
         # Extracts the time the bout ended.
         fight_item["time"] = response.xpath("//p[1]//i[3]").extract()[0].split()[-2]
         date_time = datetime.strptime(fight_item["time"], "%M:%S").time()
-        fight_item["time_seconds"] = date_time.minute * 60 + date_time.second
+        fight_item["end_second"] = date_time.minute * 60 + date_time.second
 
         # Obtains the all important stats table.
         fight_stats_table = response.xpath(
@@ -152,43 +152,43 @@ class FightsSpider(Spider):
 
             # Extracts the fighter detail urls.
             if ind == 0:
-                fight_item["fighter_1_detail_url"] = stat.split("href")[1].split('"')[1]
+                fight_item["fighter1_detail_url"] = stat.split("href")[1].split('"')[1]
             elif ind == 1:
-                fight_item["fighter_2_detail_url"] = stat.split("href")[1].split('"')[1]
+                fight_item["fighter2_detail_url"] = stat.split("href")[1].split('"')[1]
 
-            if ind <= 20 * (fight_item["rounds"] + 1):
+            if ind <= 20 * (fight_item["end_round"] + 1):
                 # Sets a base index because there are 10 total columns with two rows of data for each fighter.
                 base_ind = ind % 20
 
                 # Set statistic type (total or round by round)
                 time_type_ind = int(ind / 20)
                 if time_type_ind == 0:
-                    time_type = "tot"
+                    time_type = "total"
                 else:
-                    time_type = f"r{time_type_ind}"
+                    time_type = f"round{time_type_ind}"
 
                 # Parses the totals table.
                 if 2 <= base_ind <= 3:
-                    fight_item[f"{fighter_num}_{time_type}_kd"] = int(
+                    fight_item[f"{fighter_num}_{time_type}_knockdown"] = int(
                         re.sub("[^0-9]", "", stat)
                     )
                 elif 4 <= base_ind <= 5:
                     (
-                        fight_item[f"{fighter_num}_{time_type}_ss_l"],
-                        fight_item[f"{fighter_num}_{time_type}_ss_a"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_l"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_a"],
                     ) = self.extract_number_of(stat)
                 elif 8 <= base_ind <= 9:
                     (
-                        fight_item[f"{fighter_num}_{time_type}_s_l"],
-                        fight_item[f"{fighter_num}_{time_type}_s_a"],
+                        fight_item[f"{fighter_num}_{time_type}_strikes_l"],
+                        fight_item[f"{fighter_num}_{time_type}_strikes_a"],
                     ) = self.extract_number_of(stat)
                 elif 10 <= base_ind <= 11:
                     (
-                        fight_item[f"{fighter_num}_{time_type}_td_l"],
-                        fight_item[f"{fighter_num}_{time_type}_td_a"],
+                        fight_item[f"{fighter_num}_{time_type}_takedown_l"],
+                        fight_item[f"{fighter_num}_{time_type}_takedown_a"],
                     ) = self.extract_number_of(stat)
                 elif 14 <= base_ind <= 15:
-                    fight_item[f"{fighter_num}_{time_type}_sub_a"] = int(
+                    fight_item[f"{fighter_num}_{time_type}_submission_a"] = int(
                         re.sub("[^0-9]", "", stat)
                     )
                 elif 16 <= base_ind <= 17:
@@ -196,36 +196,36 @@ class FightsSpider(Spider):
                         re.sub("[^0-9]", "", stat)
                     )
                 elif 18 <= base_ind <= 19:
-                    fight_item[f"{fighter_num}_{time_type}_rev"] = int(
+                    fight_item[f"{fighter_num}_{time_type}_reversal"] = int(
                         re.sub("[^0-9]", "", stat)
                     )
 
             else:
                 # Sets a base index because there are 9 total columns with two rows of data for each fighter.
-                base_ind = (ind - (20 * (fight_item["rounds"] + 1))) % 18
+                base_ind = (ind - (20 * (fight_item["end_round"] + 1))) % 18
 
                 # Set statistic type (total or round by round)
-                time_type_ind = int((ind - (20 * (fight_item["rounds"] + 1))) / 18)
+                time_type_ind = int((ind - (20 * (fight_item["end_round"] + 1))) / 18)
                 if time_type_ind == 0:
-                    time_type = "tot"
+                    time_type = "total"
                 else:
-                    time_type = f"r{time_type_ind}"
+                    time_type = f"round{time_type_ind}"
 
                 # Parses the significant strikes table.
                 if 6 <= base_ind <= 7:
                     (
-                        fight_item[f"{fighter_num}_{time_type}_ss_head_l"],
-                        fight_item[f"{fighter_num}_{time_type}_ss_head_a"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_head_l"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_head_a"],
                     ) = self.extract_number_of(stat)
                 elif 8 <= base_ind <= 9:
                     (
-                        fight_item[f"{fighter_num}_{time_type}_ss_body_l"],
-                        fight_item[f"{fighter_num}_{time_type}_ss_body_a"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_body_l"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_body_a"],
                     ) = self.extract_number_of(stat)
                 elif 10 <= base_ind <= 11:
                     (
-                        fight_item[f"{fighter_num}_{time_type}_ss_leg_l"],
-                        fight_item[f"{fighter_num}_{time_type}_ss_leg_a"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_leg_l"],
+                        fight_item[f"{fighter_num}_{time_type}_sigstrikes_leg_a"],
                     ) = self.extract_number_of(stat)
                 elif 12 <= base_ind <= 13:
                     (
