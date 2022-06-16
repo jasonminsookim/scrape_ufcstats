@@ -49,6 +49,7 @@ class EventsSpider(Spider):
             event_item = ScrapyEventItem()
             event_item["event_name"] = event_name
             event_item["event_date"]  = event_date
+            event_item["event_location"] = event_location
             event_item["event_url"] = event_url
             event_item["datetime_scraped"] = scrape_datetime
             yield event_item
