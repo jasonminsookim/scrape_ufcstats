@@ -14,7 +14,7 @@ class FightsSpider(Spider):
         return(pre_of, post_of)
 
     def start_requests(self):
-        event_urls = pd.read_csv("../data/events.csv")["event_url"][:10]
+        event_urls = pd.read_csv("../data/events.csv")["event_url"]
 
         for event_url in event_urls:
             yield Request(
