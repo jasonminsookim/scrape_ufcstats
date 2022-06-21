@@ -15,12 +15,13 @@ class FightsSpider(Spider):
 
     def start_requests(self):
         event_urls = pd.read_csv("../data/events.csv")["event_url"]
+        event_dates = pd.read_csv("../data/events.csv")["event_date"]
 
-        for event_url in event_urls:
+        for i in range(len(event_urls)):
             yield Request(
-                url=event_url,
+                url=event_urls[i],
                 callback=self.parse_event_fights,
-                meta={"event_url": event_url},
+                meta={"event_url": event_urls[i], "event_date": event_dates[i]},
             )
 
     def parse_event_fights(self, response):
@@ -33,6 +34,7 @@ class FightsSpider(Spider):
                 meta={
                     "scrape_datetime": scrape_datetime,
                     "event_url": response.meta["event_url"],
+                    "event_date": response.meta["event_date"]
                 },
             )
 
@@ -46,6 +48,7 @@ class FightsSpider(Spider):
         # Extracts meta data from previous parsing layer.
         fight_item["datetime_scraped"] = response.meta["scrape_datetime"]
         fight_item["event_url"] = response.meta["event_url"]
+        fight_item["event_date"] = response.meta["event_date"]
 
         # Parses the weight division for the fight.
         fight_item["division"] = (

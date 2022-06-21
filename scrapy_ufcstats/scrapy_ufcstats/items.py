@@ -306,3 +306,4 @@ class ScrapyFightItem(scrapy.Item):
     fight_url = scrapy.Field()
     datetime_scraped = scrapy.Field()
     event_url = scrapy.Field()
+    event_date = scrapy.Field()
