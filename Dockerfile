@@ -10,5 +10,4 @@ RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requ
     && rm -rf /tmp/pip-tmp
 
 COPY ./ ./
-
-ENTRYPOINT /bin/bash ./scrape.sh
+CMD /bin/bash ./scrape.sh

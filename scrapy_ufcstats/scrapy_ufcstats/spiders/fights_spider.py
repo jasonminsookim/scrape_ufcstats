@@ -1,21 +1,21 @@
 from scrapy import Spider, Request
 from datetime import datetime
-from ..items import ScrapyEventItem, ScrapyFightItem
+from ..items import ScrapyFightItem
 import pandas as pd
 import re
 
 
-class FightsSpider(Spider):        
+class FightsSpider(Spider):
     name = "fights"
 
     def extract_number_of(self, stat_string):
-        pre_of = int(re.sub('[^0-9]', '', stat_string.split('of')[0]))
-        post_of = int(re.sub('[^0-9]', '', stat_string.split('of')[1]))
-        return(pre_of, post_of)
+        pre_of = int(re.sub("[^0-9]", "", stat_string.split("of")[0]))
+        post_of = int(re.sub("[^0-9]", "", stat_string.split("of")[1]))
+        return (pre_of, post_of)
 
     def start_requests(self):
-        event_urls = pd.read_csv("../data/events.csv")["event_url"]
-        event_dates = pd.read_csv("../data/events.csv")["event_date"]
+        event_urls = pd.read_json("../data/events.json")["event_url"]
+        event_dates = pd.read_json("../data/events.json")["event_date"]
 
         for i in range(len(event_urls)):
             yield Request(
@@ -34,7 +34,7 @@ class FightsSpider(Spider):
                 meta={
                     "scrape_datetime": scrape_datetime,
                     "event_url": response.meta["event_url"],
-                    "event_date": response.meta["event_date"]
+                    "event_date": response.meta["event_date"],
                 },
             )
 
@@ -109,7 +109,9 @@ class FightsSpider(Spider):
         fight_item["win_method_details"] = response.xpath(
             "//body//div//div//div//p[2]"
         ).extract()[0]
-        fight_item["win_method_details"] = re.sub(r"<.+?>", "", fight_item["win_method_details"])
+        fight_item["win_method_details"] = re.sub(
+            r"<.+?>", "", fight_item["win_method_details"]
+        )
         fight_item["win_method_details"] = (
             fight_item["win_method_details"]
             .replace("\n", "")
@@ -130,7 +132,8 @@ class FightsSpider(Spider):
         end_round = response.xpath(
             "/html[1]/body[1]/section[1]/div[1]/div[1]/div[2]/div[2]/p[1]/i[2]"
         ).get()
-        # Data wrangles rounds by getting rid of all non numeric values and type converting string to int
+        # Data wrangles rounds by getting rid of all non numeric values
+        # and type converting string to int
         fight_item["end_round"] = int(
             re.sub("[^0-9]", "", end_round.split(" Round:\n        </i>\n ")[-1])
         )
@@ -160,7 +163,8 @@ class FightsSpider(Spider):
                 fight_item["fighter2_detail_url"] = stat.split("href")[1].split('"')[1]
 
             if ind <= 20 * (fight_item["end_round"] + 1):
-                # Sets a base index because there are 10 total columns with two rows of data for each fighter.
+                # Sets a base index because there are 10 total columns 
+                # with two rows of data for each fighter.
                 base_ind = ind % 20
 
                 # Set statistic type (total or round by round)
@@ -204,7 +208,8 @@ class FightsSpider(Spider):
                     )
 
             else:
-                # Sets a base index because there are 9 total columns with two rows of data for each fighter.
+                # Sets a base index because there are 9 total columns 
+                # with two rows of data for each fighter.
                 base_ind = (ind - (20 * (fight_item["end_round"] + 1))) % 18
 
                 # Set statistic type (total or round by round)

@@ -40,7 +40,9 @@
 					"oderwat.indent-rainbow",
 					"mechatroner.rainbow-csv",
 					"Gruntfuggly.todo-tree",
-					"2gua.rainbow-brackets"
+					"2gua.rainbow-brackets",
+					"GitHub.copilot-labs",
+					"charliermarsh.ruff"
 				]	
 			}
 		},
