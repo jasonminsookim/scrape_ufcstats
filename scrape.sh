@@ -1,4 +1,4 @@
 cd scrapy_ufcstats
-scrapy crawl events -t csv -O  ../data/events.csv
-scrapy crawl fights -t csv -O  ../data/fights.csv
+scrapy crawl events -O  ../data/events.json:json
+scrapy crawl fights -O  ../data/fights.json:json
 python3 ../src/data/io.py
