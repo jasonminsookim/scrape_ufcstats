@@ -1,4 +1,5 @@
+#!/bin/bash 
 cd scrapy_ufcstats
-scrapy crawl events -O  ../data/events.json:json
-scrapy crawl fights -O  ../data/fights.json:json
-# python3 ../src/data/io.py
+poetry run scrapy crawl events -O ../data/events.csv:csv
+poetry run scrapy crawl fights -O ../data/fights.csv:csv
+poetry run python3 ../src/data/io.py

@@ -1,13 +1,23 @@
-FROM python:3.10.5-buster
+# Use an official Python runtime as a parent image
+FROM python:latest
 
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+# Set the working directory in the container
+WORKDIR /app
 
-# [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
-COPY requirements.txt /tmp/pip-tmp/
-RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-    && rm -rf /tmp/pip-tmp
+# Install poetry
+RUN pip install poetry
 
-COPY ./ ./
-CMD /bin/bash ./scrape.sh
+# Copy the poetry configuration files into the container at /app
+COPY pyproject.toml poetry.lock* /app/
+
+# Configure Poetry:
+# - Do not create a virtual environment within the Docker container
+# - Install production dependencies only
+RUN poetry config virtualenvs.create false \
+    && poetry install 
+
+# Copy the rest of your application into the container at /app
+COPY . /app
+RUN chmod +x scrape.sh
+# Run the application
+CMD ["./scrape.sh"]

@@ -14,8 +14,8 @@ class FightsSpider(Spider):
         return (pre_of, post_of)
 
     def start_requests(self):
-        event_urls = pd.read_json("../data/events.json")["event_url"]
-        event_dates = pd.read_json("../data/events.json")["event_date"]
+        event_urls = pd.read_csv("../data/events.csv")["event_url"]
+        event_dates = pd.read_csv("../data/events.csv")["event_date"]
 
         for i in range(len(event_urls)):
             yield Request(
@@ -163,7 +163,7 @@ class FightsSpider(Spider):
                 fight_item["fighter2_detail_url"] = stat.split("href")[1].split('"')[1]
 
             if ind <= 20 * (fight_item["end_round"] + 1):
-                # Sets a base index because there are 10 total columns 
+                # Sets a base index because there are 10 total columns
                 # with two rows of data for each fighter.
                 base_ind = ind % 20
 
@@ -208,7 +208,7 @@ class FightsSpider(Spider):
                     )
 
             else:
-                # Sets a base index because there are 9 total columns 
+                # Sets a base index because there are 9 total columns
                 # with two rows of data for each fighter.
                 base_ind = (ind - (20 * (fight_item["end_round"] + 1))) % 18
 
