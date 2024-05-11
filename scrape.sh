@@ -1,4 +1,7 @@
+#!/bin/bash 
+poetry install
 cd scrapy_ufcstats
-scrapy crawl events -t csv -O  ../data/events.csv
-scrapy crawl fights -t csv -O  ../data/fights.csv
-python3 ../src/data/io.py
+poetry run scrapy crawl events -O ../data/events.csv:csv
+poetry run scrapy crawl fights -O ../data/fights.csv:csv
+cd ..
+poetry run python3 src/data/io.py

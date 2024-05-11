@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "scrape-ufcstats"
+version = "0.1.0"
+description = ""
+authors = ["Jason Kim <34352746+jasonminsookim@users.noreply.github.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+scrapy = "^2.11.1"
+ipykernel = "^6.29.4"
+pandas = "^2.2.2"
+sqlalchemy = "^2.0.30"
+psycopg2 = "^2.9.9"
+structlog = "^24.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.plugins.dotenv]
+location = ".env"
